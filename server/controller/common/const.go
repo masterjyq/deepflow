@@ -509,6 +509,7 @@ const (
 	POD_GROUP_DAEMON_SET            = 4
 	POD_GROUP_REPLICASET_CONTROLLER = 5
 	POD_GROUP_CLONESET              = 6
+	POD_GROUP_KAFKA_CLUSTER         = 7
 )
 
 const (

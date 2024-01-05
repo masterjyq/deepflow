@@ -29,12 +29,13 @@ import (
 
 func (k *KubernetesGather) getPodGroups() (podGroups []model.PodGroup, err error) {
 	log.Debug("get podgroups starting")
-	podControllers := [5][]string{}
+	podControllers := [6][]string{}
 	podControllers[0] = k.k8sInfo["*v1.Deployment"]
 	podControllers[1] = k.k8sInfo["*v1.StatefulSet"]
 	podControllers[2] = k.k8sInfo["*v1.DaemonSet"]
 	podControllers[3] = k.k8sInfo["*v1.CloneSet"]
-	podControllers[4] = k.k8sInfo["*v1.Pod"]
+	podControllers[4] = k.k8sInfo["*v1.KafkaCluster"]
+	podControllers[5] = k.k8sInfo["*v1.Pod"]
 	pgNameToTypeID := map[string]int{
 		"deployment":            common.POD_GROUP_DEPLOYMENT,
 		"statefulset":           common.POD_GROUP_STATEFULSET,
@@ -42,6 +43,7 @@ func (k *KubernetesGather) getPodGroups() (podGroups []model.PodGroup, err error
 		"daemonset":             common.POD_GROUP_DAEMON_SET,
 		"replicationcontroller": common.POD_GROUP_RC,
 		"cloneset":              common.POD_GROUP_CLONESET,
+		"kafkacluster":          common.POD_GROUP_KAFKA_CLUSTER,
 	}
 	for t, podController := range podControllers {
 		for _, c := range podController {
@@ -92,6 +94,9 @@ func (k *KubernetesGather) getPodGroups() (podGroups []model.PodGroup, err error
 				serviceType = common.POD_GROUP_CLONESET
 				label = "cloneset:" + namespace + ":" + name
 			case 4:
+				serviceType = common.POD_GROUP_KAFKA_CLUSTER
+				label = "kafkacluster:" + namespace + ":" + name
+			case 5:
 				replicas = 0
 				if metaData.Get("ownerReferences").GetIndex(0).Get("kind").MustString() == "InPlaceSet" {
 					uID = metaData.Get("ownerReferences").GetIndex(0).Get("uid").MustString()
